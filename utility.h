@@ -1,6 +1,7 @@
+#include <linux/skbuff.h>
 #define IOTYR_IDENTIFIER	0x4ae7
 
-struct iotyr_net_status {
+struct iothdr {
 	__u64	param1:8,
 			param2:8,
 			param3:8,
@@ -24,3 +25,4 @@ static struct jprobe probe_##fName = { \
 
 #define REGISTER_JPROBE(fName)		register_jprobe(&probe_##fName)
 #define UNREGISTER_JPROBE(fName)	unregister_jprobe(&probe_##fName)
+
