@@ -6,6 +6,9 @@
 #include <linux/tcp.h>
 #include <linux/ip.h>
 
+#include <linux/proc_fs.h>
+#include <linux/seq_file.h>
+
 #include <linux/jiffies.h>
 
 #include "tbi.h"
@@ -25,6 +28,32 @@ struct file* fp;
 
 struct TBI tbi[3];
 unsigned long last_jiffies;
+#include <linux/module.h>
+#include <linux/proc_fs.h>
+#include <linux/seq_file.h>
+
+static struct proc_dir_entry *foo_proc_dir = NULL;
+static struct proc_dir_entry *foo_proc_file = NULL;
+
+static int hello_proc_show(struct seq_file *m, void *v) {
+	seq_printf(m,"%lu,%lu,%lu,%lu,%lu,%lu,%lu,%lu,%lu\n", 
+				tbi[0].t, tbi[0].b, tbi[0].i,
+				tbi[1].t, tbi[1].b, tbi[1].i,
+				tbi[2].t, tbi[2].b, tbi[2].i);
+  return 0;
+}
+
+static int hello_proc_open(struct inode *inode, struct  file *file) {
+  return single_open(file, hello_proc_show, NULL);
+}
+
+static const struct file_operations hello_proc_fops = {
+  .owner = THIS_MODULE,
+  .open = hello_proc_open,
+  .read = seq_read,
+  .llseek = seq_lseek,
+  .release = single_release,
+};
 
 unsigned int hook_func(void *priv, struct sk_buff *skb, const struct nf_hook_state *state)
 {
@@ -58,11 +87,16 @@ unsigned int hook_func(void *priv, struct sk_buff *skb, const struct nf_hook_sta
 			tbi[2].t += transmit_time;
 		}
 		last_jiffies = jiffies;
-		file_write(fp,&foff,"%u,%u,%u,%u,%u,%u,%u,%u,%u\n", 
-				tbi[0].t, tbi[0].b, tbi[0].i,
-				tbi[1].t, tbi[1].b, tbi[1].i,
-				tbi[2].t, tbi[2].b, tbi[2].i);
+//		file_write(fp,&foff,"%u,%u,%u,%u,%u,%u,%u,%u,%u\n", 
+//				tbi[0].t, tbi[0].b, tbi[0].i,
+//				tbi[1].t, tbi[1].b, tbi[1].i,
+//				tbi[2].t, tbi[2].b, tbi[2].i);
 		// give signal to user program
+		foo_proc_dir = proc_mkdir("TBI", NULL);
+		foo_proc_file = proc_create("tbi", 0, foo_proc_dir, &hello_proc_fops);
+//		remove_proc_subtree("TBI", NULL);
+//		remove_proc_entry("tbi", foo_proc_dir);
+//		remove_proc_entry("TBI", NULL);
 	}
 	return NF_ACCEPT;
 }

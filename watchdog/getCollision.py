@@ -10,9 +10,10 @@ PORT=54321
 
 class MyEventHandler(FileSystemEventHandler):
     def do_action(self, event):
-        f = open("../log/tbi.txt", "r")
-        last = f.readlines()[-1]
-        print(last)
+        f = open("/proc/TBI/tbi", "r")
+        line = f.readline()
+#        last = f.readlines()[-1]
+        print(line)
         f.close()
 
     def on_modified(self, event):
