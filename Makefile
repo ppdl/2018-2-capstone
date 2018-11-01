@@ -1,5 +1,5 @@
-obj-m += jprobe.o
-KDIR = $(HOME)/linux
+obj-m += njprobe.o
+KDIR = /usr/src/linux-headers-4.15.0-38-generic
 all:
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules
 clean:
