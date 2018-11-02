@@ -1,8 +1,7 @@
 obj-m := netf-proc.o
-netf-proc-objs :=  tbi_extract.o file_ops.o 
+netf-proc-objs := hub.o tbi.o
 
 KDIR = /lib/modules/$(shell uname -r)/build
-
 all :
 	make -C $(KDIR) M=$(PWD) modules
 
