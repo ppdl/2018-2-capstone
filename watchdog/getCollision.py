@@ -12,26 +12,22 @@ class MyEventHandler(FileSystemEventHandler):
     def do_action(self, event):
         f = open("/proc/TBI/tbi", "r")
         line = f.readline()
-#        last = f.readlines()[-1]
         print(line)
         f.close()
 
-    def on_modified(self, event):
-        print("Files are modified")
+    def on_any_event(self, event):
         self.do_action(event)
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO,
-                        format='%(asctime)s - %(message)s',
-                        datefmt='%Y-%m-%d %H:%M:%S')
     path = sys.argv[1] if len(sys.argv) > 1 else '.'
     event_handler = MyEventHandler()
     observer = Observer()
-    observer.schedule(event_handler, path, recursive=True)
+    observer.schedule(event_handler, "/proc/TBI/", recursive=False)
     observer.start()
     try:
-        pass
+        while True:
+            time.sleep(0.01)
     except KeyboardInterrupt:
         observer.stop()
     observer.join()
