@@ -17,13 +17,13 @@
 #define TERMINAL1	0xa02a0002
 #define TERMINAL2	0xa02a0003
 
+unsigned long last_jiffies;
 unsigned int hook_func(void *priv, struct sk_buff *skb, const struct nf_hook_state *state)
 {
 	struct tcphdr *th;
 	struct iphdr *ih;
 	unsigned long transmit_time;
 	
-	idle_time = jiffies - last_jiffies;
 	th = 0;
 	ih=ip_hdr(skb);
 	if(ih->protocol == 6) th = tcp_hdr(skb);
@@ -33,7 +33,7 @@ unsigned int hook_func(void *priv, struct sk_buff *skb, const struct nf_hook_sta
 		else if(ntohl(ih->saddr) == TERMINAL1) update_tbi(1, transmit_time);
 		else if(ntohl(ih->saddr) == TERMINAL2) update_tbi(2, transmit_time);
 
-		proc_create("tbi", 0, NULL, &tbi_proc_fops);		
+		proc_create("tbi", 0, NULL, &write_tbi_info);		
 	}
 	return NF_ACCEPT;
 }
@@ -62,5 +62,5 @@ module_init(init_hello);
 module_exit(exit_hello);
 
 MODULE_AUTHOR("Team IoTyranno");
-MODULE_DESCRIPTION("collecting data");
+MODULE_DESCRIPTION("hub module");
 MODULE_LICENSE("GPL");

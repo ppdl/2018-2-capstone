@@ -1,5 +1,5 @@
-obj-m := netf-proc.o
-netf-proc-objs := hub.o tbi.o
+obj-m := iotyr-terminal.o
+iotyr-terminal-objs := terminal.o collision.o
 
 KDIR = /lib/modules/$(shell uname -r)/build
 all :

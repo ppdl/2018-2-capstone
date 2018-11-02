@@ -9,39 +9,39 @@
 #include <linux/proc_fs.h>
 #include <linux/seq_file.h>
 
-#include "tbi.h"
+#include "collision.h"
+
+unsigned long last_sequence;
 
 unsigned int hook_func(void *priv, struct sk_buff *skb, const struct nf_hook_state *state)
 {
 	struct tcphdr *th;
 	struct iphdr *ih;
-	unsigned long transmit_time;
+	unsigned long current_sequence;
 	
-	idle_time = jiffies - last_jiffies;
 	th = 0;
 	ih=ip_hdr(skb);
 	if(ih->protocol == 6) th = tcp_hdr(skb);
 	if(th) {
-		transmit_time = msecs_to_jiffies(skb->data_len / R_BITRATE);
-		if(ntohl(ih->saddr) == TERMINAL0) update_tbi(0, transmit_time);
-		else if(ntohl(ih->saddr) == TERMINAL1) update_tbi(1, transmit_time);
-		else if(ntohl(ih->saddr) == TERMINAL2) update_tbi(2, transmit_time);
+		current_sequence = ntohl(th->seq);
+		if(current_sequence <= last_sequence) total_collision++;
+		else last_sequence = current_sequence;
 
-		proc_create("tbi", 0, NULL, &tbi_proc_fops);		
+		proc_create("collision_count", 0, NULL, &write_collision_info);		
 	}
 	return NF_ACCEPT;
 }
 static struct nf_hook_ops nfho = {
 	.hook		= hook_func,
-	.hooknum	= NF_INET_PRE_ROUTING,
+	.hooknum	= NF_INET_POST_ROUTING,
 	.pf			= PF_INET,
 	.priority	= NF_IP_PRI_FIRST,
 };
 
 int __init init_hello(void)
 {
-	last_jiffies = jiffies;
-	memset(tbi, 0, sizeof(tbi));
+	last_sequence = 0;
+	total_collision = 0;
 	nf_register_net_hook(&init_net, &nfho);
 	return 0;
 }
@@ -56,5 +56,5 @@ module_init(init_hello);
 module_exit(exit_hello);
 
 MODULE_AUTHOR("Team IoTyranno");
-MODULE_DESCRIPTION("collecting data");
+MODULE_DESCRIPTION("terminal side module");
 MODULE_LICENSE("GPL");

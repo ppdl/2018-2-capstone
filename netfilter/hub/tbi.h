@@ -20,6 +20,6 @@ struct TBI {
 extern struct TBI tbi[3];
 extern unsigned long last_jiffies;
 
-extern const struct file_operations tbi_proc_fops;
-void update_tbi_idle();
+extern const struct file_operations write_tbi_info;
+void update_tbi_idle(void);
 void update_tbi(int terminal_no, unsigned long transmit_time);

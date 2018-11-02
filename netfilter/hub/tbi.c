@@ -1,10 +1,9 @@
 #include "tbi.h"
 
 struct TBI tbi[3];
-unsigned long last_jiffies;
 
 static int tbi_proc_print(struct seq_file *m, void *v) {
-	seq_printf(m,"%lu,%lu,%lu,%lu,%lu,%lu,%lu,%lu,%lu\n", 
+	seq_printf(m,"%lu,%lu,%lu,%lu,%lu,%lu,%lu,%lu,%lu", 
 				tbi[0].t, tbi[0].b, tbi[0].i,
 				tbi[1].t, tbi[1].b, tbi[1].i,
 				tbi[2].t, tbi[2].b, tbi[2].i);
@@ -15,7 +14,7 @@ static int tbi_proc_open(struct inode *inode, struct  file *file) {
 	return single_open(file, tbi_proc_print, NULL);
 }
 
-const struct file_operations tbi_proc_fops = {
+const struct file_operations write_tbi_info = {
 	.owner = THIS_MODULE,
 	.open = tbi_proc_open,
 	.read = seq_read,
@@ -23,7 +22,7 @@ const struct file_operations tbi_proc_fops = {
 	.release = single_release,
 };
 
-void update_tbi_idle()
+void update_tbi_idle(void)
 {
 	unsigned long idle_time = jiffies - last_jiffies;
 
