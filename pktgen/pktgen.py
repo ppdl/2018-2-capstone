@@ -9,14 +9,14 @@ NORM_PKT        = 50000      #50K   15%
 SMALL_PKT       = 5000       #5K    20%
 TINY_PKT        = 100        #100B  50%
 
-
-MAX_SLEEP_TIME = 50
+MIN_SLEEP_TIME = 5
+MAX_SLEEP_TIME = 10 
 
 HOST='10.42.0.1'
 PORT=54321
 
 while True:
-    randSleep = random.randrange(1, MAX_SLEEP_TIME)
+    randSleep = random.randrange(MIN_SLEEP_TIME, MAX_SLEEP_TIME)
     randSize = random.randrange(1,100)
     if randSize > 95:
         randStr = 'c' * random.randrange(1,MEGA_BIG_PKT)
