@@ -11,6 +11,7 @@ static int tbi_proc_print(struct seq_file *m, void *v) {
 }
 
 static int tbi_proc_open(struct inode *inode, struct  file *file) {
+	printk(KERN_INFO"open file\n");
 	return single_open(file, tbi_proc_print, NULL);
 }
 

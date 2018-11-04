@@ -13,5 +13,5 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         with conn:
             with open('/proc/collision_count', 'r') as f:
                 collision = f.readline()
-                conn.sendall(collision).encode())
+                conn.sendall(collision.encode())
                 print('send: ' + collision)

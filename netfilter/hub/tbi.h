@@ -5,11 +5,6 @@
 
 #define R_BITRATE	8
 
-#define TERMINAL0	0xa02a00df	//10.42.0.223
-#define TERMINAL1	0xa02a0002
-#define TERMINAL2	0xa02a0003
-
-
 struct TBI {
 	unsigned long t;
 	unsigned long b;

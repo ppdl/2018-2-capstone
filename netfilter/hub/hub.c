@@ -15,9 +15,9 @@
 
 #define R_BITRATE	8
 
-#define TERMINAL0	0xa02a00df	//10.42.0.223
-#define TERMINAL1	0xa02a00d9	//10.42.0.217
-#define TERMINAL2	0xa02a0003
+#define TERMINAL0	0xa2a00df	//10.42.0.223
+#define TERMINAL1	0xa2a00d9	//10.42.0.217
+#define TERMINAL2	0xa2a00be	//10.42.0.190
 
 static int timer_interval = 500;
 static void timer_handler(unsigned long data);
@@ -34,6 +34,7 @@ unsigned int hook_func(void *priv, struct sk_buff *skb, const struct nf_hook_sta
 	if(ih->protocol == 6) th = tcp_hdr(skb);
 	if(th) {
 		transmit_time = msecs_to_jiffies(skb->data_len / R_BITRATE);
+		printk(KERN_INFO"%x\n", ntohl(ih->saddr));
 		if(ntohl(ih->saddr) == TERMINAL0) update_tbi(0, transmit_time);
 		else if(ntohl(ih->saddr) == TERMINAL1) update_tbi(1, transmit_time);
 		else if(ntohl(ih->saddr) == TERMINAL2) update_tbi(2, transmit_time);

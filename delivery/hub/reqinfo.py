@@ -2,8 +2,8 @@ import socket
 import time
 
 TERMINAL0 = '10.42.0.233'
-TERMINAL1 = '10.42.0.111'
-TERMINAL2 = '10.42.0.222'
+TERMINAL1 = '10.42.0.217'
+TERMINAL2 = '10.42.0.190'
 PORT      = 54210
 
 COLLISION = {

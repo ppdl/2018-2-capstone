@@ -54,8 +54,8 @@ unsigned int post_hook_func(void *priv, struct sk_buff *skb, const struct nf_hoo
 			}
 		}
 
-		proc_create("collision_count", 0, NULL, &write_collision_info);	
 		remove_proc_entry("collision_count", NULL);
+		proc_create("collision_count", 0, NULL, &write_collision_info);	
 		if(syn_acked) {
 			syn_acked = false;
 			syn_require = false;
