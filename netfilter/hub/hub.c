@@ -19,7 +19,7 @@
 #define TERMINAL1	0xa02a0002
 #define TERMINAL2	0xa02a0003
 
-static int timer_interval = 1000;
+static int timer_interval = 5000;
 static void timer_handler(unsigned long data);
 
 unsigned long last_jiffies;
