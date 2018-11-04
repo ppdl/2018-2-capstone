@@ -9,6 +9,8 @@
 #include <linux/proc_fs.h>
 #include <linux/seq_file.h>
 
+#include <linux/timer.h>
+
 #include "tbi.h"
 
 #define R_BITRATE	8
@@ -16,6 +18,9 @@
 #define TERMINAL0	0xa02a00df	//10.42.0.223
 #define TERMINAL1	0xa02a0002
 #define TERMINAL2	0xa02a0003
+
+static int timer_interval = 1000;
+static void timer_handler(unsigned long data);
 
 unsigned long last_jiffies;
 unsigned int hook_func(void *priv, struct sk_buff *skb, const struct nf_hook_state *state)
@@ -44,16 +49,30 @@ static struct nf_hook_ops nfho = {
 	.priority	= NF_IP_PRI_FIRST,
 };
 
+
+DEFINE_TIMER(timer_update_idle, (void*)timer_handler);
+static void timer_handler(unsigned long data)
+{
+	update_tbi_idle();
+	mod_timer(&timer_update_idle, jiffies + msecs_to_jiffies(timer_interval));
+	printk(KERN_INFO"%lu,%lu,%lu,%lu,%lu,%lu,%lu,%lu,%lu\n",
+			tbi[0].t, tbi[0].b, tbi[0].i,
+			tbi[1].t, tbi[1].b, tbi[1].i,
+			tbi[2].t, tbi[2].b, tbi[2].i);
+}
+
 int __init init_hello(void)
 {
 	last_jiffies = jiffies;
 	memset(tbi, 0, sizeof(tbi));
+	mod_timer(&timer_update_idle, jiffies + msecs_to_jiffies(timer_interval));
 	nf_register_net_hook(&init_net, &nfho);
 	return 0;
 }
 
 void __exit exit_hello(void)
 {
+	del_timer(&timer_update_idle);
 	remove_proc_entry("tbi", NULL);
 	nf_unregister_net_hook(&init_net, &nfho);
 }
