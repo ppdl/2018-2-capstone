@@ -13,4 +13,4 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             received += len(data)
             if not data:
                 break
-        print("received %d"%received)
+        print("received %d from %s"%(received,addr[0]))
