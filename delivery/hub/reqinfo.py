@@ -15,7 +15,7 @@ COLLISION = {
 try:
     with open('result.txt', 'w') as result:
         while True:
-            time.sleep(1)
+            time.sleep(5)
             with open("/proc/tbi", "r") as f:
                 line = f.readline()
                 print(line)
@@ -31,7 +31,7 @@ try:
                         if collision:
                             COLLISION[HOST] = collision
                 if all(v for v in COLLISION.values()):  
-                    line += ',%(TERMINAL0)d,%(TERMINAL1)d,%(TERMINAL2)d\n'%COLLISION
+                    line += ',%d,%d,%d\n'%(COLLISION[TERMINAL0], COLLISION[TERMINAL1], COLLISION[TERMINAL2])
                     print('write record: ' + line)
                     result.write(line)
 except KeyboardInterrupt:

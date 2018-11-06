@@ -1,4 +1,5 @@
 import socket
+import time
 
 HOST=''
 PORT=54321
