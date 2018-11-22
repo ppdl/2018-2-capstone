@@ -29,7 +29,7 @@ void file_close(struct file *file)
 {
     filp_close(file, NULL);
 }
-
+/*
 int file_read(struct file *file, unsigned long long offset, unsigned char *data, unsigned int size) 
 {
     mm_segment_t oldfs;
@@ -57,7 +57,7 @@ int file_write(struct file *file, unsigned long long offset, unsigned char *data
     set_fs(oldfs);
     return ret;
 }
-
+*/
 //struct file* file;
 int file_sync(struct file *file) 
 {
@@ -72,9 +72,10 @@ long file_read_int(struct file* file)
 {
 	long ret;
 	char buffer[100];
-
+	unsigned long long offset=0;
 	memset(buffer, 0, 100);
-	file_read(file, 0, buffer, 100);
+	kernel_read(file,buffer,100,&offset);
+	//file_read(file, 0, buffer, 100);
 	kstrtol(buffer, 10, &ret);
 	return ret;
 }
