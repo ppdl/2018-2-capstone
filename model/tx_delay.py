@@ -104,24 +104,30 @@ def main():
             collision = sess.run(hypothesis,feed_dict=feed_dict_ex)
             delayrate = 1
             (d1, d2, d3) = mkdelay(collision,delayrate)
+            '''
             count += 1
             sum1 += d1
             sum2 += d2
             sum3 += d3
-            d1 -= (sum1/count)
-            d1 *= 1000
-            d2 -= (sum2/count)
-            d2 *= 1000
-            d3 -= (sum3/count)
-            d3 *= 1000
+            if d1:
+                d1 -= 1.1
+            if d2:
+                d2 -= 0
+            if d3:
+                d3 -= 0.1
             if not start:
                 start = True
                 continue
-
-            for TERMINAL,DELAY in zip([TERMINAL0, TERMINAL1, TERMINAL2],[d1,d2,d3]):
+            '''
+            d1*=1000
+            d2*=1000
+            d3*=1000
+            #print(int(d1*1000), int(d2*1000), int(d3*1000))
+            for TERMINAL,DELAY in zip([TERMINAL0, TERMINAL1, TERMINAL2],[int(d1),int(d2),int(d3)]):
                 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    print('trying to connect terminal ' + TERMINAL + ' delay: ' + str(DELAY))
                     s.connect((TERMINAL,PORT))
-                    s.sendall(int(DELAY))
+                    s.sendall(str(DELAY).encode())
             '''
             with open(args.Write_Delay, 'w') as ff:
                 ff.write(str(d1)+","+str(d2)+","+str(d3))
