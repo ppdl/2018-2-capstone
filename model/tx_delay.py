@@ -3,7 +3,13 @@ from tensorflow.contrib.layers import fully_connected, batch_norm, dropout
 from tensorflow.contrib.framework import arg_scope
 import numpy as np
 import argparse
+import socket
 from time import sleep
+
+TERMINAL0 = '10.42.0.223'
+TERMINAL1 = '10.42.0.217'
+TERMINAL2 = '10.42.0.190'
+PORT = 56789
 
 keep_prob = 0.7
 X = tf.placeholder(tf.float32, [None, 9])
@@ -80,6 +86,10 @@ def main():
     tmp = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     t = None
     start = False
+    sum1=0
+    sum2=0
+    sum3=0
+    count=0
     try:
         while True :
             line = f.readline()
@@ -94,13 +104,29 @@ def main():
             collision = sess.run(hypothesis,feed_dict=feed_dict_ex)
             delayrate = 1
             (d1, d2, d3) = mkdelay(collision,delayrate)
-            #print((d1,d2,d3))
+            count += 1
+            sum1 += d1
+            sum2 += d2
+            sum3 += d3
+            d1 -= (sum1/count)
+            d1 *= 1000
+            d2 -= (sum2/count)
+            d2 *= 1000
+            d3 -= (sum3/count)
+            d3 *= 1000
             if not start:
                 start = True
                 continue
+
+            for TERMINAL,DELAY in zip([TERMINAL0, TERMINAL1, TERMINAL2],[d1,d2,d3]):
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    s.connect((TERMINAL,PORT))
+                    s.sendall(int(DELAY))
+            '''
             with open(args.Write_Delay, 'w') as ff:
                 ff.write(str(d1)+","+str(d2)+","+str(d3))
             print(str(d1)+","+str(d2)+","+str(d3))
+            '''
             sleep(1)
 
     except KeyboardInterrupt : # Ctrl + C
