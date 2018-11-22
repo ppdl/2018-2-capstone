@@ -6,6 +6,7 @@
 #include <asm/segment.h>
 #include <asm/uaccess.h>
 #include <linux/buffer_head.h>
+#include <linux/string.h>
 
 struct file *file_open(const char *path, int flags, int rights) 
 {
@@ -66,12 +67,22 @@ int file_sync(struct file *file)
 
 char buffer[100];
 long tol;
+
+long file_read_int(struct file* file)
+{
+	long ret;
+	char buffer[100];
+
+	memset(buffer, 0, 100);
+	file_read(file, 0, buffer, 100);
+	kstrtol(buffer, 10, &ret);
+	return ret;
+}
+/*
 int __init Init(void)
 {
 	file = file_open("target.txt", O_RDONLY, 0644);
-	file_read(file, 0, buffer, 10);
-	kstrtol(buffer, 10, &tol);
-	printk(KERN_INFO"buffer:%ld\n", tol); 
+	printk(KERN_INFO"buffer:%ld\n", file_read_int(file)); 
 	return 0;
 }
 
@@ -82,5 +93,6 @@ void __exit Exit(void)
 
 module_init(Init);
 module_exit(Exit);
-
+*/
 MODULE_LICENSE("GPL");
+

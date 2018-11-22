@@ -1,50 +1,96 @@
+#include <linux/kernel.h>
+#include <linux/module.h>
 #include <linux/netfilter.h>
+
 #include <linux/fs.h>
 #include <asm/segment.h>
 #include <asm/uaccess.h>
 #include <linux/buffer_head.h>
+#include <linux/string.h>
 
-// flag: O_CREATE | O_APPEND
-// mode: 0644
-struct file *file_open(const char *path, int flags, int mode) 
+struct file *file_open(const char *path, int flags, int rights) 
 {
-	struct file* filp = NULL;
-	mm_segment_t oldfs;
-	int err = 0;
+    struct file *filp = NULL;
+    mm_segment_t oldfs;
+    int err = 0;
 
-	oldfs = get_fs();
-	set_fs(get_ds());
-	filp = filp_open(path, flags, mode);
-	set_fs(oldfs);
-	if(IS_ERR(filp)) {
-		err = PTR_ERR(filp);
-		return NULL;
-	}
-	return filp;
+    oldfs = get_fs();
+    set_fs(get_ds());
+    filp = filp_open(path, flags, rights);
+    set_fs(oldfs);
+    if (IS_ERR(filp)) {
+        err = PTR_ERR(filp);
+        return NULL;
+    }
+    return filp;
 }
 
-void file_close(struct file *file)
+void file_close(struct file *file) 
 {
-	filp_close(file, NULL);
+    filp_close(file, NULL);
 }
 
-// offset: put a address of variable initialized by 0. automatically updated by vfs_write
-int file_write(struct file *file, unsigned long long* offset, const char* fmt, ...)
+int file_read(struct file *file, unsigned long long offset, unsigned char *data, unsigned int size) 
 {
-	char buffer[256];
-	mm_segment_t oldfs;
-	int ret;
+    mm_segment_t oldfs;
+    int ret;
 
-	va_list args;
-	va_start(args, fmt);
-	vsprintf(buffer, fmt, args);
-	va_end(args);
-	
-	oldfs = get_fs();
-	set_fs(get_ds());
-	
-	ret = vfs_write(file, buffer, strlen(buffer), offset);
+    oldfs = get_fs();
+    set_fs(get_ds());
 
-	set_fs(oldfs);
+    ret = vfs_read(file, data, size, &offset);
+
+    set_fs(oldfs);
+    return ret;
+}   
+
+int file_write(struct file *file, unsigned long long offset, unsigned char *data, unsigned int size) 
+{
+    mm_segment_t oldfs;
+    int ret;
+
+    oldfs = get_fs();
+    set_fs(get_ds());
+
+    ret = vfs_write(file, data, size, &offset);
+
+    set_fs(oldfs);
+    return ret;
+}
+
+struct file* file;
+int file_sync(struct file *file) 
+{
+    vfs_fsync(file, 0);
+    return 0;
+}
+
+char buffer[100];
+long tol;
+
+long file_read_int(struct file* file)
+{
+	long ret;
+	char buffer[100];
+
+	memset(buffer, 0, 100);
+	file_read(file, 0, buffer, 100);
+	kstrtol(buffer, 10, &ret);
 	return ret;
 }
+int __init Init(void)
+{
+	file = file_open("target.txt", O_RDONLY, 0644);
+	printk(KERN_INFO"buffer:%ld\n", file_read_int(file)); 
+	return 0;
+}
+
+void __exit Exit(void)
+{
+	file_close(file);
+}
+
+module_init(Init);
+module_exit(Exit);
+
+MODULE_LICENSE("GPL");
