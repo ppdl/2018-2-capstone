@@ -10,7 +10,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     while True:
         conn,addr=s.accept()
         with conn:
-            delay=conn.recv(1024).decode()
-            with open('delay','w') as f:
-                print('update delay: %d'%delay)
+            delay = int(conn.recv(1024).decode())
+            with open('delay', 'w') as f:
                 f.write(delay)
