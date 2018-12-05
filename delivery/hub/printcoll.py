@@ -20,7 +20,7 @@ try:
     sync=False
     while True:
         time.sleep(0.1)
-        for HOST in [TERMIANL0, TERMINAL1, TERMINAL2]:
+        for HOST in [TERMINAL0, TERMINAL1, TERMINAL2]:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.connect((HOST,PORT))
                 s.sendall(b'a')
@@ -35,4 +35,4 @@ try:
         print("Node1: {0:<7}, Node2: {1:<7}, Node3: {2:<7}\r", end='')
 
 except KeyboardInterrupt:
-    
+   pass 
